@@ -2,7 +2,21 @@
 
 set -e
 
-source /data/.env
+# source /data/.env
+source .env
+
+# whisper=$(which whisper)
+whisper="/Users/pascal/Work/Yodio/whisper.cpp/main"
+
+# model="/whisper/models/ggml-large.bin"
+# model="/Users/pascal/Work/Yodio/whisper.cpp/models/ggml-large.bin"
+# model="/Users/pascal/Work/Temp/ggml-french.bin"
+model="/Users/pascal/Work/Temp/ggml-model.bin"
+
+# -bs 5
+$whisper -l fr -m $model -f "/Users/pascal/Desktop/Projects/Whisper/test-008.wav" -of "test-french" -ovtt -pc -nf -bs 5
+
+exit 0;
 
 while true; do
 
@@ -28,7 +42,8 @@ while true; do
         ffmpeg -y -i "xdio-${hash}.mp4" -ar 16000 -ac 1 -c:a pcm_s16le "xdio-${hash}.wav"
 
         # Fine-tuning with: -bs 4 -bo 4
-        whisper -l fr -m /whisper/models/ggml-large.bin -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -bs 4 -bo 4
+        # whisper -l fr -m $model -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -bs 4 -bo 4
+        $whisper -l fr -m $model -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -bs 4
 
         # Done.
         task=$(curl -s -H "Accept: application/json" \
