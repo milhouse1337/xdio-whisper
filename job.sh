@@ -5,11 +5,7 @@ set -e
 # source /data/.env
 source .env
 
-# whisper=$(which whisper)
-# whisper="/Users/pascal/Work/Code/whisper.cpp/main"
 whisper="./whisper/main"
-
-# model="/Users/pascal/Work/Code/whisper.cpp/models/ggml-large.bin"
 model="./whisper/models/ggml-large-v3.bin"
 
 job=$(curl -s -H "Accept: application/json" \
@@ -28,7 +24,6 @@ if [ "$len" -gt 0 ]; then
     info=$(echo "${job}" | jq -r '.job.info')
     audio=$(echo "${job}" | jq -r '.job.audio')
 
-    # Todo: Fix HLS stream (.m3u8)
     curl -sL "$audio" > "xdio-${hash}.mp4"
     ffmpeg -y -i "xdio-${hash}.mp4" -ar 16000 -ac 1 -c:a pcm_s16le "xdio-${hash}.wav"
 
@@ -49,4 +44,3 @@ if [ "$len" -gt 0 ]; then
     rm "xdio-${hash}.vtt"
 
 fi
-
