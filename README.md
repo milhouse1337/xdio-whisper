@@ -8,7 +8,7 @@
 
 ## Setup
 
-Install a few dependencies with Brew.
+Install a few dependencies with [Brew](https://brew.sh/).
 
 ```bash
 brew install curl ffmpeg jq wget
@@ -21,7 +21,7 @@ git clone https://github.com/milhouse1337/xdio-whisper.git
 cd xdio-whisper
 ```
 
-Install Whisper (as submodule) and download the model.
+Fetch Whisper (as submodule) and download the model.
 
 ```bash
 git submodule update --init --remote --recursive
@@ -53,7 +53,7 @@ vi .env
 
 Please contact us on [Discord](https://discord.gg/A6tHyATaw7) if you need help with the API keys.
 
-## Launch
+## Launch the worker. 🚀
 
 To start the process.
 
