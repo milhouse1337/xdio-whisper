@@ -28,11 +28,6 @@ git submodule update --init --remote --recursive
 cd whisper
 bash ./models/download-ggml-model.sh large-v3
 make
-```
-
-Go back to the main folder.
-
-```bash
 cd ..
 ```
 
