@@ -6,9 +6,11 @@ set -e
 source .env
 
 # whisper=$(which whisper)
-whisper="/Users/pascal/Work/Code/whisper.cpp/main"
+# whisper="/Users/pascal/Work/Code/whisper.cpp/main"
+whisper="./whisper/main"
 
-model="/Users/pascal/Work/Code/whisper.cpp/models/ggml-large.bin"
+# model="/Users/pascal/Work/Code/whisper.cpp/models/ggml-large.bin"
+model="./whisper/models/ggml-large-v3.bin"
 
 job=$(curl -s -H "Accept: application/json" \
     -H "Authorization: Bearer $XDIO_API_TOKEN" \
