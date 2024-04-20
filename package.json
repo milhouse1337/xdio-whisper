@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@soketi/soketi": "^1.6.0",
+    "axios": "^1.6.8",
+    "bullmq": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "pusher-js": "^8.4.0-rc2"
+  }
+}

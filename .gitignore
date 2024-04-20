@@ -4,3 +4,7 @@
 
 # macOS-specific files
 .DS_Store
+node_modules
+
+xdio.log
+*.vtt
