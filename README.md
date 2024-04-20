@@ -14,6 +14,13 @@ Install a few dependencies with Brew.
 brew install curl ffmpeg jq wget
 ```
 
+Clone this repo.
+
+```bash
+git clone https://github.com/milhouse1337/xdio-whisper.git
+cd xdio-whisper
+```
+
 Install Whisper (as submodule) and download the model.
 
 ```bash
@@ -23,19 +30,33 @@ bash ./models/download-ggml-model.sh large-v3
 make
 ```
 
-Add the `.env` file and update it.
+Go back to the main folder.
+
+```bash
+cd ..
+```
+
+Install node dependencies.
+
+```bash
+npm ci
+```
+
+Copy the default `.env` file and update it.
 
 ```bash
 cp .env.example .env
 ```
 
-You can update the file in your editor.
+You can update the file in your favorite editor. 
 
 ```bash
 vi .env
 # code .env
 # zed .env
 ```
+
+Please contact us on [Discord](https://discord.gg/A6tHyATaw7) if you need help with the API keys.
 
 ## Launch
 
@@ -47,8 +68,8 @@ To start the process.
 
 ## Docker
 
-WIP: The build fails for now.
+WIP: The build fails for now, we are working on it.
 
 ```bash
-docker run -it --rm -v "$(pwd)":/data:rw milhouse1337/xdio-whisper
+# docker run -it --rm -v "$(pwd)":/data:rw milhouse1337/xdio-whisper
 ```
