@@ -21,7 +21,7 @@ git clone https://github.com/milhouse1337/xdio-whisper.git
 cd xdio-whisper
 ```
 
-Fetch Whisper (as submodule) and download the model.
+Fetch Whisper (as submodule), download the model and build it.
 
 ```bash
 git submodule update --init --remote --recursive
@@ -31,7 +31,7 @@ make
 cd ..
 ```
 
-Install node dependencies.
+Install Node dependencies.
 
 ```bash
 npm ci
