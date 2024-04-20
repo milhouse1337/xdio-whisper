@@ -22,7 +22,6 @@ len=$(echo "${job}" | jq -r 'length')
 if [ "$len" -gt 0 ]; then
 
     hash=$(echo "${job}" | jq -r '.job.hash')
-    mode=$(echo "${job}" | jq -r '.job.mode')
     opts=$(echo "${job}" | jq -r '.job.opts')
     info=$(echo "${job}" | jq -r '.job.info')
     audio=$(echo "${job}" | jq -r '.job.audio')

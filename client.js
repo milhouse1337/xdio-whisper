@@ -12,8 +12,8 @@ const conn = {
     }
 };
 
-const worker = new Worker('foo', async job => {
-    console.log('# Job started: ', job.id, job.name, job.data, job.opts);
+const worker = new Worker('xdio', async job => {
+    console.log('# Job started: ', job.id, job.data);
     return new Promise((resolve, reject) => {
         exec(job.data.command + ' &> xdio.log', (error, stdout, stderr) => {
             if (error) {
