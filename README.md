@@ -21,7 +21,7 @@ git clone https://github.com/milhouse1337/xdio-whisper.git
 cd xdio-whisper
 ```
 
-Fetch Whisper (as submodule), download the model and build it.
+Fetch [Whisper](https://github.com/ggerganov/whisper.cpp) (as submodule), download the model and build it.
 
 ```bash
 git submodule update --init --remote --recursive
@@ -31,7 +31,7 @@ make
 cd ..
 ```
 
-Install Node dependencies.
+Install the Node dependencies with npm.
 
 ```bash
 npm ci
@@ -43,7 +43,7 @@ Copy the default `.env` file and update it.
 cp .env.example .env
 ```
 
-You can update the file in your favorite editor. 
+You can now update the `.env` file in your favorite editor. 
 
 ```bash
 vi .env
@@ -53,7 +53,7 @@ vi .env
 
 Please contact us on [Discord](https://discord.gg/A6tHyATaw7) if you need help with the API keys.
 
-## Launch the worker. 🚀
+## Launch the worker 🚀
 
 To start the process.
 
