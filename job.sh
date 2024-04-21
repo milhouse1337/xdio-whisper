@@ -24,12 +24,16 @@ if [ "$len" -gt 0 ]; then
     info=$(echo "${job}" | jq -r '.job.info')
     audio=$(echo "${job}" | jq -r '.job.audio')
 
-    curl -sL "$audio" > "xdio-${hash}.mp4"
+    if [[ "$audio" == *".m3u8"* ]]; then
+        ffmpeg -i "$audio" -map p:0 -c copy "xdio-${hash}.mp4"
+    else
+        curl -sL "$audio" > "xdio-${hash}.mp4"
+    fi
+
     ffmpeg -y -i "xdio-${hash}.mp4" -ar 16000 -ac 1 -c:a pcm_s16le "xdio-${hash}.wav"
 
     time $whisper -l fr -m $model -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -bs 5 -et 2.8 -mc 64
 
-    # Done.
     task=$(curl -s -H "Accept: application/json" \
         -H "Authorization: Bearer $XDIO_API_TOKEN" \
         -F "vtt=@xdio-$hash.vtt" \
