@@ -13,7 +13,7 @@ const conn = {
 };
 
 const worker = new Worker('xdio', async job => {
-    console.log('# Job started: ', job.id, job.data);
+    console.log(`# Job started: ${job.id}`, job.data);
     return new Promise((resolve, reject) => {
         exec('./job.sh ' + job.data.hash + ' &> xdio.log', (error, stdout, stderr) => {
             if (error) {
@@ -33,6 +33,16 @@ worker.on('completed', job => {
 
 worker.on('failed', (job, err) => {
     console.log(`# Job failed: ${job.id} with ${err.message}`);
+});
+
+worker.on('error', (err) => {
+    console.log(`# Worker error: ${err.message}`);
+})
+
+process.on('SIGINT', async () => {
+    console.log('** Received SIGINT. Performing cleanup...');
+    await worker.close();
+    process.exit(0);
 });
 
 console.log("Worker is running and waiting for jobs.");
