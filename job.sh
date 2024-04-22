@@ -25,7 +25,7 @@ if [ "$len" -gt 0 ]; then
     audio=$(echo "${job}" | jq -r '.job.audio')
 
     if [[ "$audio" == *".m3u8"* ]]; then
-        ffmpeg -i "$audio" -map p:0 -c copy "xdio-${hash}.mp4"
+        ffmpeg -y -i "$audio" -map p:0 -c copy "xdio-${hash}.mp4"
     else
         curl -sL "$audio" > "xdio-${hash}.mp4"
     fi
