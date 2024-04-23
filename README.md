@@ -1,5 +1,7 @@
 # Xdio - Whisper
 
+This is a simple `worker` based on [BullMQ](https://docs.bullmq.io/) to dispatch translations jobs. You can contribute to our translation efforts by installing this project on your computer. It's similar to SETI@home, but instead of searching for extraterrestrial signals, you'll help us translate the entire Xdio database. 👽
+
 ## Requirements
 
 - MacOS (with Apple Silicon)
