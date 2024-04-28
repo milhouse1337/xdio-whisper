@@ -8,6 +8,9 @@ source .env
 whisper="./whisper/main"
 model="./whisper/models/ggml-large-v3.bin"
 
+# whisper="/whisper/main"
+# model="/whisper/models/ggml-large-v3.bin"
+
 job=$(curl -s -H "Accept: application/json" \
     -H "Authorization: Bearer $XDIO_API_TOKEN" \
     "$XDIO_API_URL/v2/whisper/job/$1"
@@ -25,14 +28,14 @@ if [ "$len" -gt 0 ]; then
     audio=$(echo "${job}" | jq -r '.job.audio')
 
     if [[ "$audio" == *".m3u8"* ]]; then
-        ffmpeg -y -i "$audio" -map p:0 -c copy "xdio-${hash}.mp4"
+        ffmpeg -y -loglevel error -i "$audio" -map p:0 -c copy "xdio-${hash}.mp4"
     else
         curl -sL "$audio" > "xdio-${hash}.mp4"
     fi
 
-    ffmpeg -y -i "xdio-${hash}.mp4" -ar 16000 -ac 1 -c:a pcm_s16le "xdio-${hash}.wav"
+    ffmpeg -y -loglevel error -i "xdio-${hash}.mp4" -ar 16000 -ac 1 -c:a pcm_s16le "xdio-${hash}.wav"
 
-    time $whisper -l fr -m $model -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -bs 5 -et 2.8 -mc 64
+    time $whisper -l fr -m $model -f "xdio-${hash}.wav" -of "xdio-${hash}" -ovtt -pc -pp -bs 5 -et 2.8 -mc 64
 
     task=$(curl -s -H "Accept: application/json" \
         -H "Authorization: Bearer $XDIO_API_TOKEN" \

@@ -60,7 +60,7 @@ Please contact us on [Discord](https://discord.gg/A6tHyATaw7) if you need help w
 To start the process.
 
 ```bash
-./work.sh
+npm run work
 ```
 
 ## Docker
