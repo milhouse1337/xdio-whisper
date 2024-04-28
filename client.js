@@ -16,13 +16,13 @@ const worker = new Worker('xdio', async job => {
     console.log(`# Job started: ${job.id}`, job.data);
     return new Promise((resolve, reject) => {
 
-        let time = 0;
+        // let time = 0;
         let child = exec('./job.sh ' + job.data.hash, (error, stdout, stderr) => {
             if (error) {
                 console.error(`Execution error: ${error}`);
                 reject(error);
             }
-            resolve({ time });
+            resolve({ 'status': 0 });
         });
 
         child.stdout.setEncoding('utf8');
@@ -43,40 +43,10 @@ const worker = new Worker('xdio', async job => {
                 job.updateProgress(percentage);
             }
 
-            const regex_time = /whisper_print_timings:\s+total time\s+=\s+(\d+\.?\d*)\s+ms/;
-            const match_time = data.match(regex_time);
-
-            if (match_time) {
-                time = parseInt(match_time[1], 10);
-                postPrcessTime(job.data.hash, time);
-            }
-
         });
 
     });
 }, conn);
-
-async function postPrcessTime(hash, time = 0) {
-
-    const url = process.env.XDIO_API_URL + '/v2/whisper/job/' + hash;
-    const data = {
-        time: time
-    };
-    const config = {
-        headers: {
-            'Authorization': 'Bearer ' + process.env.XDIO_API_TOKEN,
-            'Content-Type': 'application/json'
-        }
-    };
-
-    try {
-        const response = await axios.post(url, data, config);
-        console.log(response.data);
-    } catch (error) {
-        console.error('Error during the API call:', error.response ? error.response.data : error.message);
-    }
-
-}
 
 worker.on('completed', job => {
     console.log(`# Job completed: ${job.id}`);
