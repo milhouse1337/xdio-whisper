@@ -5,10 +5,10 @@ set -e
 # source /data/.env
 source .env
 
-whisper="./whisper/main"
+whisper="./whisper/build/bin/whisper-cli"
 model="./whisper/models/ggml-large-v3.bin"
 
-# whisper="/whisper/main"
+# whisper="/whisper/build/bin/whisper-cli"
 # model="/whisper/models/ggml-large-v3.bin"
 
 job=$(curl -s -H "Accept: application/json" \
