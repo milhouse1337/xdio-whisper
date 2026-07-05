@@ -26,7 +26,7 @@ cd xdio-whisper
 Fetch [Whisper](https://github.com/ggerganov/whisper.cpp) (as submodule), download the model and build it.
 
 ```bash
-git submodule update --init --remote --recursive
+git submodule update --init --recursive
 cd whisper
 bash ./models/download-ggml-model.sh large-v3
 make
