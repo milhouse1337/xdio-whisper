@@ -29,7 +29,8 @@ Fetch [Whisper](https://github.com/ggerganov/whisper.cpp) (as submodule), downlo
 git submodule update --init --recursive
 cd whisper
 bash ./models/download-ggml-model.sh large-v3
-make
+cmake -B build
+cmake --build build -j --config Release
 cd ..
 ```
 
