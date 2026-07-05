@@ -1,5 +1,5 @@
 const { Worker, Queue, QueueEvents, QueueScheduler } = require('bullmq');
-const { exec } = require('child_process');
+const { spawn } = require('child_process');
 const axios = require('axios');
 
 require('dotenv').config();
@@ -12,18 +12,20 @@ const conn = {
     }
 };
 
+// Tracks the currently running job.sh child so a forced shutdown can kill it.
+let currentChild = null;
+
 const worker = new Worker('xdio', async job => {
     console.log(`# Job started: ${job.id}`, job.data);
     return new Promise((resolve, reject) => {
 
-        // let time = 0;
-        let child = exec('./job.sh ' + job.data.hash, (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Execution error: ${error}`);
-                reject(error);
-            }
-            resolve({ 'status': 0 });
-        });
+        // Spawn job.sh in its own process group (detached) so a Ctrl+C sent to
+        // this worker's group does NOT kill the in-progress transcription.
+        // That lets worker.close() wait for the job to finish gracefully.
+        // (exec ignores `detached` for process-group purposes, so we use spawn;
+        // the argument array also avoids shell interpretation of the hash.)
+        let child = spawn('./job.sh', [job.data.hash], { detached: true });
+        currentChild = child;
 
         child.stdout.setEncoding('utf8');
         child.stdout.on('data', function (data) {
@@ -45,6 +47,21 @@ const worker = new Worker('xdio', async job => {
 
         });
 
+        child.on('error', function (error) {
+            currentChild = null;
+            console.error(`Execution error: ${error}`);
+            reject(error);
+        });
+
+        child.on('close', function (code, signal) {
+            currentChild = null;
+            if (code === 0) {
+                resolve({ 'status': 0 });
+            } else {
+                reject(new Error(`job.sh exited with code ${code}${signal ? ` (signal ${signal})` : ''}`));
+            }
+        });
+
     });
 }, conn);
 
@@ -60,10 +77,26 @@ worker.on('error', (err) => {
     console.log(`# Worker error: ${err.message}`);
 })
 
-process.on('SIGINT', async () => {
-    console.log('** Received SIGINT. The process will terminate (gracefully) after the current job.');
-    await worker.close();
+let shuttingDown = false;
+
+async function shutdown(signal) {
+    if (shuttingDown) {
+        // Second interrupt: the user is impatient — kill the running job's
+        // whole process group and exit immediately.
+        console.log(`** ${signal} again — forcing shutdown now.`);
+        if (currentChild) {
+            try { process.kill(-currentChild.pid, 'SIGKILL'); } catch (err) { /* already gone */ }
+        }
+        process.exit(1);
+    }
+
+    shuttingDown = true;
+    console.log(`** Received ${signal}. Finishing the current job, then stopping. Press Ctrl+C again to force quit.`);
+    await worker.close(); // stops fetching new jobs and waits for the active one to finish
     process.exit(0);
-});
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
 
 console.log("Worker is running and waiting for jobs.");
