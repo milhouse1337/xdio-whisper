@@ -1,4 +1,4 @@
-const { Worker, Queue, QueueEvents, QueueScheduler } = require('bullmq');
+const { Worker } = require('bullmq');
 const { spawn } = require('child_process');
 const axios = require('axios');
 
@@ -9,7 +9,15 @@ const conn = {
         host: process.env.REDIS_HOST,
         port: process.env.REDIS_PORT,
         password: process.env.REDIS_AUTH
-    }
+    },
+    // Transcriptions run for minutes; the default 30s lock is far too short and
+    // gets lost during long jobs -> "could not renew lock". The worker renews
+    // every lockDuration/2, so a 5-minute lock leaves ample slack even when the
+    // event loop is briefly busy. maxStalledCount is a backstop: re-running a
+    // job is safe (the /v2/whisper/done endpoint no-ops once a job is done).
+    lockDuration: 300000,     // 5 min
+    stalledInterval: 300000,  // check for stalled jobs every 5 min
+    maxStalledCount: 3,
 };
 
 // Tracks the currently running job.sh child so a forced shutdown can kill it.
@@ -17,6 +25,12 @@ let currentChild = null;
 
 const worker = new Worker('xdio', async job => {
     console.log(`# Job started: ${job.id}`, job.data);
+    // Only push a progress update when the whole-percent value actually changes.
+    // whisper's -pp callback emits progress constantly; calling updateProgress on
+    // every chunk floods the Redis connection the lock renewal shares, which is a
+    // direct contributor to lost locks.
+    let lastPct = -1;
+
     return new Promise((resolve, reject) => {
 
         // Spawn job.sh in its own process group (detached) so a Ctrl+C sent to
@@ -42,7 +56,10 @@ const worker = new Worker('xdio', async job => {
 
             if (match_progress) {
                 const percentage = parseInt(match_progress[1], 10);
-                job.updateProgress(percentage);
+                if (percentage !== lastPct) {
+                    lastPct = percentage;
+                    job.updateProgress(percentage);
+                }
             }
 
         });
